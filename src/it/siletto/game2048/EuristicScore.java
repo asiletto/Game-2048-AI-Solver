@@ -1,4 +1,4 @@
-package it.siletto.game2048.euristic;
+package it.siletto.game2048;
 
 public interface EuristicScore {
 

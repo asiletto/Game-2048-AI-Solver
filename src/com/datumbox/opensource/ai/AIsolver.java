@@ -16,7 +16,8 @@
  */
 package com.datumbox.opensource.ai;
 
-import it.siletto.game2048.euristic.EuristicScore;
+import it.siletto.game2048.ClusteringScore;
+import it.siletto.game2048.EuristicScore;
 
 import java.util.HashMap;
 import java.util.List;
@@ -33,10 +34,12 @@ import com.datumbox.opensource.game.Board;
 public class AIsolver {
     
 	protected EuristicScore euristicScore;
+	protected ClusteringScore clusteringScore;
 	
-    public AIsolver(EuristicScore euristicScore) {
+    public AIsolver(EuristicScore euristicScore, ClusteringScore clusteringScore) {
 		super();
 		this.euristicScore = euristicScore;
+		this.clusteringScore = clusteringScore;
 	}
 
 	/**
@@ -78,7 +81,7 @@ public class AIsolver {
      * @param player
      * @return
      * @throws CloneNotSupportedException 
-     */
+     
     private Map<String, Object> minimax(Board theBoard, int depth, Player player) throws CloneNotSupportedException {
         Map<String, Object> result = new HashMap<>();
         
@@ -86,7 +89,7 @@ public class AIsolver {
         int bestScore;
         
         if(depth==0 || theBoard.isGameTerminated()) {
-            bestScore=euristicScore.calculateScore(theBoard.getScore(),theBoard.getNumberOfEmptyCells(),calculateClusteringScore(theBoard.getBoardArray()));
+            bestScore=euristicScore.calculateScore(theBoard.getScore(),theBoard.getNumberOfEmptyCells(),clusteringScore.calculateScore(theBoard.getBoardArray()));
         }
         else {
             if(player == Player.USER) {
@@ -138,7 +141,7 @@ public class AIsolver {
         
         return result;
     }
-    
+    */
     /**
      * Finds the best move bay using the Alpha-Beta pruning algorithm.
      * 
@@ -165,7 +168,7 @@ public class AIsolver {
             }
         }
         else if(depth==0) {
-            bestScore=euristicScore.calculateScore(theBoard.getScore(),theBoard.getNumberOfEmptyCells(),calculateClusteringScore(theBoard.getBoardArray()));
+            bestScore=euristicScore.calculateScore(theBoard.getScore(),theBoard.getNumberOfEmptyCells(), clusteringScore.calculateScore(theBoard.getBoardArray()));
         }
         else {
             if(player == Player.USER) {
@@ -227,53 +230,5 @@ public class AIsolver {
         return result;
     }
         
-    /**
-     * Calculates a heuristic variance-like score that measures how clustered the
-     * board is.
-     * 
-     * @param boardArray
-     * @return 
-     */
-    private int calculateClusteringScore(int[][] boardArray) {
-        int clusteringScore=0;
-        
-        int[] neighbors = {-1,0,1};
-        
-        for(int i=0;i<boardArray.length;++i) {
-            for(int j=0;j<boardArray.length;++j) {
-                if(boardArray[i][j]==0) {
-                    continue; //ignore empty cells
-                }
-                
-                //clusteringScore-=boardArray[i][j];
-                
-                //for every pixel find the distance from each neightbors
-                int numOfNeighbors=0;
-                int sum=0;
-                for(int k : neighbors) {
-                    int x=i+k;
-                    if(x<0 || x>=boardArray.length) {
-                        continue;
-                    }
-                    for(int l : neighbors) {
-                        int y = j+l;
-                        if(y<0 || y>=boardArray.length) {
-                            continue;
-                        }
-                        
-                        if(boardArray[x][y]>0) {
-                            ++numOfNeighbors;
-                            sum+=Math.abs(boardArray[i][j]-boardArray[x][y]);
-                        }
-                        
-                    }
-                }
-                
-                clusteringScore+=sum/numOfNeighbors;
-            }
-        }
-        
-        return clusteringScore;
-    }
     
 }

@@ -16,7 +16,8 @@
  */
 package com.datumbox.opensource;
 
-import it.siletto.game2048.euristic.impl.OriginalEuristicScore;
+import it.siletto.game2048.impl.OriginalClusteringScore;
+import it.siletto.game2048.impl.OriginalEuristicScore;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -100,7 +101,7 @@ public class ConsoleGame {
         int total=10;
         System.out.println("Running "+total+" games to estimate the accuracy:");
         
-        AIsolver ai = new AIsolver(new OriginalEuristicScore());
+        AIsolver ai = new AIsolver(new OriginalEuristicScore(), new OriginalClusteringScore());
         
         for(int i=0;i<total;++i) {
             Board theGame = new Board();
@@ -135,7 +136,7 @@ public class ConsoleGame {
         System.out.println("Play the 2048 Game!"); 
         System.out.println("Use 8 for UP, 6 for RIGHT, 2 for DOWN and 4 for LEFT. Type a to play automatically and q to exit. Press enter to submit your choice.");
         
-        AIsolver ai = new AIsolver(new OriginalEuristicScore());
+        AIsolver ai = new AIsolver(new OriginalEuristicScore(), new OriginalClusteringScore());
         
         int hintDepth = 7;
         Board theGame = new Board();

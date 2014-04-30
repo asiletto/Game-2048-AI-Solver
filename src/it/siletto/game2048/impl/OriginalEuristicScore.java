@@ -1,6 +1,6 @@
-package it.siletto.game2048.euristic.impl;
+package it.siletto.game2048.impl;
 
-import it.siletto.game2048.euristic.EuristicScore;
+import it.siletto.game2048.EuristicScore;
 
 public class OriginalEuristicScore implements EuristicScore {
 
