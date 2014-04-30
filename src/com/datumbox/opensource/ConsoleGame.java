@@ -16,13 +16,16 @@
  */
 package com.datumbox.opensource;
 
-import com.datumbox.opensource.ai.AIsolver;
-import com.datumbox.opensource.dataobjects.ActionStatus;
-import com.datumbox.opensource.game.Board;
-import com.datumbox.opensource.dataobjects.Direction;
+import it.siletto.game2048.euristic.impl.OriginalEuristicScore;
+
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Scanner;
+
+import com.datumbox.opensource.ai.AIsolver;
+import com.datumbox.opensource.dataobjects.ActionStatus;
+import com.datumbox.opensource.dataobjects.Direction;
+import com.datumbox.opensource.game.Board;
 
 /**
  * The main class of the Game.
@@ -52,7 +55,7 @@ public class ConsoleGame {
                 switch (choice) {
                     case 1:  playGame();
                              break;
-                    case 2:  calculateAccuracy();
+                    case 2:  calculateAccuracy(7);
                              break;
                     case 3:  help();
                              break;
@@ -92,21 +95,22 @@ public class ConsoleGame {
      * 
      * @throws CloneNotSupportedException 
      */
-    public static void calculateAccuracy() throws CloneNotSupportedException {
+    public static void calculateAccuracy(int hintDepth) throws CloneNotSupportedException {
         int wins=0;
         int total=10;
         System.out.println("Running "+total+" games to estimate the accuracy:");
         
+        AIsolver ai = new AIsolver(new OriginalEuristicScore());
+        
         for(int i=0;i<total;++i) {
-            int hintDepth = 7;
             Board theGame = new Board();
-            Direction hint = AIsolver.findBestMove(theGame, hintDepth);
+            Direction hint = ai.findBestMove(theGame, hintDepth);
             ActionStatus result=ActionStatus.CONTINUE;
             while(result==ActionStatus.CONTINUE || result==ActionStatus.INVALID_MOVE) {
                 result=theGame.action(hint);
 
                 if(result==ActionStatus.CONTINUE || result==ActionStatus.INVALID_MOVE ) {
-                    hint = AIsolver.findBestMove(theGame, hintDepth);
+                    hint = ai.findBestMove(theGame, hintDepth);
                 }
             }
 
@@ -131,9 +135,11 @@ public class ConsoleGame {
         System.out.println("Play the 2048 Game!"); 
         System.out.println("Use 8 for UP, 6 for RIGHT, 2 for DOWN and 4 for LEFT. Type a to play automatically and q to exit. Press enter to submit your choice.");
         
+        AIsolver ai = new AIsolver(new OriginalEuristicScore());
+        
         int hintDepth = 7;
         Board theGame = new Board();
-        Direction hint = AIsolver.findBestMove(theGame, hintDepth);
+        Direction hint = ai.findBestMove(theGame, hintDepth);
         printBoard(theGame.getBoardArray(), theGame.getScore(), hint);
         
         try {
@@ -142,8 +148,8 @@ public class ConsoleGame {
             
             ActionStatus result=ActionStatus.CONTINUE;
             while(result==ActionStatus.CONTINUE || result==ActionStatus.INVALID_MOVE) {
-                inputChar = (char)unbuffered.read();
-                //inputChar = 'a';
+                //inputChar = (char)unbuffered.read();
+                inputChar = 'a';
                 if(inputChar=='\n' || inputChar=='\r') {
                     continue;
                 }
@@ -172,7 +178,7 @@ public class ConsoleGame {
                 }
                 
                 if(result==ActionStatus.CONTINUE || result==ActionStatus.INVALID_MOVE ) {
-                    hint = AIsolver.findBestMove(theGame, hintDepth);
+                    hint = ai.findBestMove(theGame, hintDepth);
                 }
                 else {
                     hint = null;

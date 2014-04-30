@@ -16,11 +16,14 @@
  */
 package com.datumbox.opensource.ai;
 
-import com.datumbox.opensource.dataobjects.Direction;
-import com.datumbox.opensource.game.Board;
+import it.siletto.game2048.euristic.EuristicScore;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.datumbox.opensource.dataobjects.Direction;
+import com.datumbox.opensource.game.Board;
 
 /**
  * The AIsolver class that uses Artificial Intelligence to estimate the next move.
@@ -29,7 +32,14 @@ import java.util.Map;
  */
 public class AIsolver {
     
-    /**
+	protected EuristicScore euristicScore;
+	
+    public AIsolver(EuristicScore euristicScore) {
+		super();
+		this.euristicScore = euristicScore;
+	}
+
+	/**
      * Player vs Computer enum class
      */
     public enum Player {
@@ -52,7 +62,7 @@ public class AIsolver {
      * @return
      * @throws CloneNotSupportedException 
      */
-    public static Direction findBestMove(Board theBoard, int depth) throws CloneNotSupportedException {
+    public Direction findBestMove(Board theBoard, int depth) throws CloneNotSupportedException {
         //Map<String, Object> result = minimax(theBoard, depth, Player.USER);
         
         Map<String, Object> result = alphabeta(theBoard, depth, Integer.MIN_VALUE, Integer.MAX_VALUE, Player.USER);
@@ -69,14 +79,14 @@ public class AIsolver {
      * @return
      * @throws CloneNotSupportedException 
      */
-    private static Map<String, Object> minimax(Board theBoard, int depth, Player player) throws CloneNotSupportedException {
+    private Map<String, Object> minimax(Board theBoard, int depth, Player player) throws CloneNotSupportedException {
         Map<String, Object> result = new HashMap<>();
         
         Direction bestDirection = null;
         int bestScore;
         
         if(depth==0 || theBoard.isGameTerminated()) {
-            bestScore=heuristicScore(theBoard.getScore(),theBoard.getNumberOfEmptyCells(),calculateClusteringScore(theBoard.getBoardArray()));
+            bestScore=euristicScore.calculateScore(theBoard.getScore(),theBoard.getNumberOfEmptyCells(),calculateClusteringScore(theBoard.getBoardArray()));
         }
         else {
             if(player == Player.USER) {
@@ -140,7 +150,7 @@ public class AIsolver {
      * @return
      * @throws CloneNotSupportedException 
      */
-    private static Map<String, Object> alphabeta(Board theBoard, int depth, int alpha, int beta, Player player) throws CloneNotSupportedException {
+    private Map<String, Object> alphabeta(Board theBoard, int depth, int alpha, int beta, Player player) throws CloneNotSupportedException {
         Map<String, Object> result = new HashMap<>();
         
         Direction bestDirection = null;
@@ -155,7 +165,7 @@ public class AIsolver {
             }
         }
         else if(depth==0) {
-            bestScore=heuristicScore(theBoard.getScore(),theBoard.getNumberOfEmptyCells(),calculateClusteringScore(theBoard.getBoardArray()));
+            bestScore=euristicScore.calculateScore(theBoard.getScore(),theBoard.getNumberOfEmptyCells(),calculateClusteringScore(theBoard.getBoardArray()));
         }
         else {
             if(player == Player.USER) {
@@ -216,21 +226,7 @@ public class AIsolver {
         
         return result;
     }
-    
-    /**
-     * Estimates a heuristic score by taking into account the real score, the
-     * number of empty cells and the clustering score of the board.
-     * 
-     * @param actualScore
-     * @param numberOfEmptyCells
-     * @param clusteringScore
-     * @return 
-     */
-    private static int heuristicScore(int actualScore, int numberOfEmptyCells, int clusteringScore) {
-        int score = (int) (actualScore+Math.log(actualScore)*numberOfEmptyCells -clusteringScore);
-        return Math.max(score, Math.min(actualScore, 1));
-    }
-    
+        
     /**
      * Calculates a heuristic variance-like score that measures how clustered the
      * board is.
@@ -238,7 +234,7 @@ public class AIsolver {
      * @param boardArray
      * @return 
      */
-    private static int calculateClusteringScore(int[][] boardArray) {
+    private int calculateClusteringScore(int[][] boardArray) {
         int clusteringScore=0;
         
         int[] neighbors = {-1,0,1};
